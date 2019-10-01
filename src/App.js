@@ -1,24 +1,50 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 
-function App() {
+const useFetch = (url) => {
+  const [responseData, setResponseData] = useState([])
+  const [loading, setLoading] = useState(true)
+
+   const fetchUrl = async () => {
+    const response = await fetch(url)
+    const json = await response.json()
+
+    setResponseData(json)
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    fetchUrl()
+  }, [url]);
+
+  return [responseData, loading]
+}
+
+const WithLoading = ({loading, children}) => {
+  if(loading) {
+    return <div>Loading...</div>
+  } else {
+    return {...children}
+  }
+}
+
+const App = () => {
+  const [movies, loading] = useFetch('movie/popular')
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h1>Movie Search</h1>
       </header>
+      <div>
+        <WithLoading loading={loading}>
+          <ol>
+            {movies.results && movies.results.length && movies.results.map(movie => <li key={movie.id}>
+              <h2>{movie.title}</h2>
+            </li>)}
+          </ol>
+        </WithLoading>
+      </div>
     </div>
   );
 }
