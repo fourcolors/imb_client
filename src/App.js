@@ -1,35 +1,30 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import './App.css';
+import _ from 'lodash'
 
-
-const fetchUrl = async (url, onSuccess, onError) => {
-  try{
-    const response = await fetch(url)
-    const json = await response.json()
-
-    onSuccess(json)
-  } catch (e) {
-    onError(e)
-  }
-}
-
-const useFetch = (url) => {
+const useFetch = (url, conditions=true) => {
   const [responseData, setResponseData] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
-  const onSuccess = (json) => {
-    setResponseData(json)
-    setLoading(false)
-  }
+  const fetchUrl = async (url) => {
+    try{
+      const response = await fetch(url)
+      const json = await response.json()
 
-  const onError = (error) => {
-    setLoading(false)
-    console.log("You dun broke somethin", error)
+      setResponseData(json)
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      console.log("You dun broke somethin", error)
+    }
   }
 
   useEffect(() => {
-    fetchUrl(url, onSuccess, onError)
-  }, [url]);
+    if (conditions) {
+      setLoading(true)
+      fetchUrl(url)
+    }
+  }, [url, conditions]);
 
   return [responseData, loading]
 }
@@ -42,16 +37,20 @@ const WithLoading = ({loading, children}) => {
   }
 }
 
-const MovieList = ({listTitle, movies}) => {
-  if (movies)  {
+const MovieList = ({movies}) => {
+  if (movies.results)  {
     return(
       <div>
-        <ol>
-          {movies.results && movies.results.length && movies.results.map(movie => 
-            <li key={movie.id}>
-              <h2>{movie.title}</h2>
-            </li>)}
-        </ol>
+          {movies.results.length ? 
+            <ol>
+            {movies.results.map(movie => 
+                  <li key={movie.id}>
+                    <h2>{movie.title}</h2>
+                  </li>)}
+              </ol>
+            :
+            <div>Search found no results</div>
+        }
       </div>
     )
   } else {
@@ -78,9 +77,9 @@ const SearchResults = ({movies}) => {
 }
 
 const App = () => {
-  const [popularMovies, popularMoviesLoading] = useFetch('movie/popular')
   const [query, setQuery] = useState('')
-
+  const [popularMovies, loading] = useFetch('movie/popular')
+  const [searchResults, searching] = useFetch(`/search/movie?query=${query}`, query.trim().length)
 
   return (
     <div className="App">
@@ -88,9 +87,9 @@ const App = () => {
         <h1>Movie Search</h1>
         <input type="search" onChange={(e) => setQuery(e.target.value)}/>
       </header>
-      <WithLoading loading={popularMoviesLoading}>
-        {query.trim().length ? <div>search results</div> : <PopularMovieList movies={popularMovies} />}
-      </WithLoading>
+        {query.trim().length ? <SearchResults movies={searchResults} /> : <PopularMovieList movies={popularMovies} />}
+        {loading && <div>Loading...</div>}
+        {searching && <div>Searching...</div>}
     </div>
   );
 }
