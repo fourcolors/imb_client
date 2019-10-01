@@ -46,6 +46,7 @@ const MovieList = ({movies}) => {
             {movies.results.map(movie => 
                   <li key={movie.id}>
                     <h2>{movie.title}</h2>
+                    <p>{movie.overview}</p>
                   </li>)}
               </ol>
             :
