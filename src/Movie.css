@@ -1,0 +1,19 @@
+.Movie-container {
+  display: flex;
+  padding: 20px;
+  justify-content: center;
+}
+
+.Movie-poster-container {
+  filter: drop-shadow(0 0 0.75rem black);
+}
+
+.Movie-details {
+  padding: 20px;
+  width: 300px;
+}
+
+.Movie-alt-details {
+  list-style: none;
+  padding: 0;
+}

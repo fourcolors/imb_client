@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
-import _ from "lodash";
 
 export const useFetch = (url, conditions = true) => {
   const [responseData, setResponseData] = useState([]);
@@ -28,13 +27,18 @@ export const useFetch = (url, conditions = true) => {
 
   return [responseData, loading];
 };
-
-const WithLoading = ({ loading, children }) => {
-  if (loading) {
-    return <div>Loading...</div>;
-  } else {
-    return { ...children };
-  }
+const MovieTile = ({ movie }) => {
+  return (
+    <li className="App-movie-tile">
+      <a href={`/movie/${movie.id}`} target="_blank" rel="noopener noreferrer">
+        <img
+          className="App-movie-poster"
+          src={`http://image.tmdb.org/t/p/w185/${movie.poster_path}`}
+          alt={movie.title}
+        />
+      </a>
+    </li>
+  );
 };
 
 const MovieList = ({ movies }) => {
@@ -42,14 +46,9 @@ const MovieList = ({ movies }) => {
     return (
       <div>
         {movies.results.length ? (
-          <ol>
+          <ol className="App-list-parent">
             {movies.results.map(movie => (
-              <li key={movie.id}>
-                <a href={`/movie/${movie.id}`} target="_blank">
-                  <h2>{movie.title}</h2>
-                </a>
-                <p>{movie.overview}</p>
-              </li>
+              <MovieTile key={movie.id} movie={movie} />
             ))}
           </ol>
         ) : (
@@ -65,7 +64,7 @@ const MovieList = ({ movies }) => {
 const PopularMovieList = ({ movies }) => {
   return (
     <div>
-      <h2>Popular Movies</h2>
+      <h2 className="App-header-2">Popular Movies</h2>
       <MovieList movies={movies} />
     </div>
   );
@@ -74,7 +73,7 @@ const PopularMovieList = ({ movies }) => {
 const SearchResults = ({ movies }) => {
   return (
     <div>
-      <h2>Search Results</h2>
+      <h2 className="App-header-2">Search Results</h2>
       <MovieList movies={movies} />
     </div>
   );
@@ -91,9 +90,14 @@ const App = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Movie Search</h1>
-        <input type="search" onChange={e => setQuery(e.target.value)} />
+        <h1>Movies</h1>
       </header>
+      <input
+        className="App-search"
+        placeholder="Search by title..."
+        type="text"
+        onChange={e => setQuery(e.target.value)}
+      />
       {query.trim().length ? (
         <SearchResults movies={searchResults} />
       ) : (
