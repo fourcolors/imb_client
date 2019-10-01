@@ -1,64 +1,59 @@
-import React, {useState, useEffect} from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import Movie from './Movie'
-import * as serviceWorker from './serviceWorker';
-import UrlPattern from 'url-pattern'
-import { find } from 'ramda'
-const createBrowserHistory = require('history').createBrowserHistory
-const history = createBrowserHistory()
+import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import Movie from "./Movie";
+import * as serviceWorker from "./serviceWorker";
+import UrlPattern from "url-pattern";
+import { find } from "ramda";
+const createBrowserHistory = require("history").createBrowserHistory;
+const history = createBrowserHistory();
 
 const routes = [
   {
-    path: '/',
+    path: "/",
     component: App
   },
   {
-    path: '/movie/:id',
+    path: "/movie/:id",
     component: Movie
   }
-]
+];
 
 const Router = ({ routes }) => {
-  const [location, setLocation] = useState(history.location)
+  const [location, setLocation] = useState(history.location);
   useEffect(() => {
     const unlisten = history.listen((location, action) => {
-      setLocation(location)
-    })
+      setLocation(location);
+    });
     return () => {
-      unlisten()
-    }
-  })
+      unlisten();
+    };
+  });
 
-  let params
+  let params;
   const route = find(route => {
-    const pattern = new UrlPattern(route.path)
-    return (params = pattern.match(location.pathname))
-  }, routes)
+    const pattern = new UrlPattern(route.path);
+    return (params = pattern.match(location.pathname));
+  }, routes);
 
   if (!route) {
-    return <div>Error 404, page not found</div>
+    return <div>Error 404, page not found</div>;
   }
 
   if (route.check && route.check()) {
-    history.push(route.redirect)
-    history.go()
-    return null
+    history.push(route.redirect);
+    history.go();
+    return null;
   }
 
-  return <route.component {...params} />
-}
+  return <route.component {...params} />;
+};
 
 const Main = () => {
-  return(
-    <Router routes={routes} />
-  )
-}
+  return <Router routes={routes} />;
+};
 
-ReactDOM.render(<Main />, document.getElementById('root'));
+ReactDOM.render(<Main />, document.getElementById("root"));
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
