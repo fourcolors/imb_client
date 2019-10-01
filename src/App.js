@@ -6,11 +6,16 @@ const useFetch = (url) => {
   const [loading, setLoading] = useState(true)
 
    const fetchUrl = async () => {
-    const response = await fetch(url)
-    const json = await response.json()
+     try{
+      const response = await fetch(url)
+      const json = await response.json()
 
-    setResponseData(json)
-    setLoading(false)
+      setResponseData(json)
+      setLoading(false)
+     } catch (e) {
+      setLoading(false)
+      console.log("You dun broke somethin", e)
+     }
   }
 
   useEffect(() => {
